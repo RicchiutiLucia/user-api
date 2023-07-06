@@ -1,0 +1,42 @@
+service: user-api
+
+plugins:
+  - serverless-python-requirements
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: dev
+  region: us-east-1
+
+functions:
+  createUser:
+    handler: handler.create_user
+    events:
+      - http:
+          path: create/user
+          method: post
+
+  getUserById:
+    handler: handler.get_user_by_id
+    events:
+      - http:
+          path: get/user/{id}
+          method: get
+
+resources:
+  Resources:
+    UsersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: users
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
